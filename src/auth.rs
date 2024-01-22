@@ -11,6 +11,7 @@ pub struct JwtClaims {
     aud: String,
     exp: i64,
     iat: i64,
+    subject : String
 }
 
 impl JwtClaims {
@@ -49,6 +50,7 @@ impl JwtClaims {
         aud_url: String,
         valid_from: Option<i64>,
         expires_after: Option<i64>,
+        subject : String
     ) -> Self {
         let iat = match valid_from {
             Some(x) => x,
@@ -64,6 +66,7 @@ impl JwtClaims {
             aud: aud_url,
             exp,
             iat,
+            subject
         }
     }
 }
