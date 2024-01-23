@@ -11,7 +11,7 @@ pub struct JwtClaims {
     aud: String,
     exp: i64,
     iat: i64,
-    subject : String
+    sub : String
 }
 
 impl JwtClaims {
@@ -66,7 +66,7 @@ impl JwtClaims {
             aud: aud_url,
             exp,
             iat,
-            subject
+            sub : subject
         }
     }
 }
