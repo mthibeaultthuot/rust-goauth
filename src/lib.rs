@@ -211,6 +211,8 @@ pub(crate) async fn get_token_with_client_and_body(
 
 #[cfg(test)]
 mod tests {
+    use smpl_jwt::RSAKey;
+    use crate::scopes::Scope;
     use super::*;
 
     doctest!("../README.md");
@@ -231,13 +233,14 @@ mod tests {
             String::from(token_url),
             Some(1482317385),
             Some(3600),
+            "some_email".to_string()
         );
         let key = match RSAKey::from_pem(private_key_file) {
             Ok(x) => x,
             Err(e) => panic!("{}", e),
         };
         let jwt = Jwt::new(claims, key, None);
-        assert_eq!(jwt.finalize().unwrap(), "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzb21lX2lzcyIsInNjb3BlIjoiaHR0cHM6Ly93d3cuZ29vZ2xlYXBpcy5jb20vYXV0aC9kZXZzdG9yYWdlLnJlYWRfd3JpdGUiLCJhdWQiOiJodHRwczovL3d3dy5nb29nbGVhcGlzLmNvbS9vYXV0aDIvdjQvdG9rZW4iLCJleHAiOjE0ODIzMjA5ODUsImlhdCI6MTQ4MjMxNzM4NX0=.BldQozpzNYnLnYWBbqwAWY1j2hPDD3oVY9EOG0eRJN77sC4ZInEyGJT5eXLD39C726TdrEVCHmvhKBJFmaFL2BXNto69_v8lz-3oGnFL5FkUr4RRpukd_6tj7-RZzx15LIzdTqzKfAUlqWoZUdze8Fcd1NJ6w1g49CCghvN_eryvecALpjnHoBkKlIXnSm_udiSf26cYWvCikmW5g8nUqAduFsIYfR-4LMwyUfYH1hNC64SRsfLH9bL4-tyeaoUCv5MXTIhxrJbrhQy3TEOSc5didDrMoYNUu_qjJvxBQbq1Um1W1SpyvSd4eVJn18xZcOmCnoE73RDZcxT5hDpaRQ==");
+        assert_eq!(jwt.finalize().unwrap(), "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzb21lX2lzcyIsInNjb3BlIjoiaHR0cHM6Ly93d3cuZ29vZ2xlYXBpcy5jb20vYXV0aC9kZXZzdG9yYWdlLnJlYWRfd3JpdGUiLCJhdWQiOiJodHRwczovL3d3dy5nb29nbGVhcGlzLmNvbS9vYXV0aDIvdjQvdG9rZW4iLCJleHAiOjE0ODIzMjA5ODUsImlhdCI6MTQ4MjMxNzM4NSwic3ViIjoic29tZV9lbWFpbCJ9.JSrsHCfdELjuEqpe5VIozIcYNGKWpGEdAO1rAERWA1YGwXy55O1dtC9bHnIIYohI5DRScLi0pIK9hCmyQ2tvum9VZets1vCR0G39DdbwkyVqnpadYq1EOy7hXc0-cleMfkOy6XPfmXcjFaRAjibQ48nITblQ72w6m-YC5KJYrJNo_I-Hv9KZQ3ADM2zjYyZ42BlaVxEseQi8aOPrKKY5Xr5k8CNlrfZ-MbTLkde6l5Z8LLc853wdQnx4UMGX6zo81-0gbP1vvi6mLrnGH7QwrcZ6b3GQHhBGOiAMNqs5tS-kpQ1NyUvf4VFSYF8A3qq7Dje_nMTIvvzuOE8lQPBHjA==");
     }
 
     #[test]
@@ -257,7 +260,32 @@ mod tests {
             String::from(token_url),
             None,
             None,
+            "some_email".to_string()
         );
+        let key = match RSAKey::from_pem(private_key_file) {
+            Ok(x) => x,
+            Err(e) => panic!("{}", e),
+        };
+        let jwt = Jwt::new(claims, key, None);
+        match get_token_legacy(&jwt, None) {
+            Ok(x) => println!("{}", x),
+            Err(e) => println!("{}", e),
+        };
+    }
+
+
+
+    #[test]
+    fn get_token_with_sub_test() {
+        let token_url = "https://www.googleapis.com/oauth2/v4/token";
+        let iss = "<some_iss>"; // https://developers.google.com/identity/protocols/OAuth2ServiceAccount
+        let private_key_file = "random_rsa_for_testing";
+
+        let claims = JwtClaims::new(String::from(iss),
+                                    &Scope::Calendar,
+                                    String::from(token_url),
+                                    None, None, "mathieutt@veemdigital.com".to_string());
+
         let key = match RSAKey::from_pem(private_key_file) {
             Ok(x) => x,
             Err(e) => panic!("{}", e),

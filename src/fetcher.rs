@@ -142,6 +142,7 @@ mod tests {
             String::from(token_url.clone()),
             None,
             None,
+            "SOME_EMAIL".to_string()
         );
 
         let jwt = Jwt::new(claims, credentials.rsa_key().unwrap(), None);
